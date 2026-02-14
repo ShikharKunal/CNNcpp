@@ -327,9 +327,9 @@ std::shared_ptr<Tensor> linear_forward(std::shared_ptr<Tensor> x,
 
 // ---- Layer wrappers ----
 static float kaiming_uniform(size_t fan_in, size_t fan_out) {
-    float std = std::sqrtf(2.0f / static_cast<float>(fan_in));
+    float std = sqrtf(2.0f / static_cast<float>(fan_in));
     static std::mt19937 rng(42);
-    std::uniform_real_distribution<float> dist(-std * std::sqrtf(3.0f), std * std::sqrtf(3.0f));
+    std::uniform_real_distribution<float> dist(-std * sqrtf(3.0f), std * sqrtf(3.0f));
     return dist(rng);
 }
 
@@ -337,9 +337,9 @@ Conv2DLayer::Conv2DLayer(size_t in_c, size_t out_c, size_t k, size_t s, size_t p
     : in_channels(in_c), out_channels(out_c), kernel_size(k), stride(s), pad(p) {
     size_t n = out_c * in_c * k * k;
     std::vector<float> w(n);
-    float scale = std::sqrtf(2.0f / (in_c * k * k));
+    float scale = sqrtf(2.0f / (in_c * k * k));
     std::mt19937 rng(42);
-    std::uniform_real_distribution<float> dist(-scale * std::sqrtf(3.0f), scale * std::sqrtf(3.0f));
+    std::uniform_real_distribution<float> dist(-scale * sqrtf(3.0f), scale * sqrtf(3.0f));
     for (size_t i = 0; i < n; ++i) w[i] = dist(rng);
     std::vector<size_t> w_shape = {out_c, in_c, k, k};
     weight = std::make_shared<Tensor>(w, w_shape, true);
@@ -365,9 +365,9 @@ std::shared_ptr<Tensor> MaxPool2DLayer::forward(std::shared_ptr<Tensor> x) {
 LinearLayer::LinearLayer(size_t in_f, size_t out_f) : in_features(in_f), out_features(out_f) {
     size_t n = in_f * out_f;
     std::vector<float> w(n);
-    float scale = std::sqrtf(2.0f / in_f);
+    float scale = sqrtf(2.0f / in_f);
     std::mt19937 rng(43);
-    std::uniform_real_distribution<float> dist(-scale * std::sqrtf(3.0f), scale * std::sqrtf(3.0f));
+    std::uniform_real_distribution<float> dist(-scale * sqrtf(3.0f), scale * sqrtf(3.0f));
     for (size_t i = 0; i < n; ++i) w[i] = dist(rng);
     std::vector<size_t> w_shape = {out_f, in_f};
     weight = std::make_shared<Tensor>(w, w_shape, true);

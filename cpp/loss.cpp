@@ -25,7 +25,7 @@ std::shared_ptr<Tensor> softmax(std::shared_ptr<Tensor> x) {
         // Compute exp and sum
         float sum = 0.0f;
         for (size_t j = 0; j < last_dim; ++j) {
-            row_out[j] = std::expf(row_in[j] - m);
+            row_out[j] = expf(row_in[j] - m);
             sum += row_out[j];
         }
         
@@ -84,7 +84,7 @@ std::shared_ptr<Tensor> cross_entropy_loss(std::shared_ptr<Tensor> logits,
         // Compute softmax AND cache it for backward
         float sum_exp = 0.0f;
         for (size_t j = 0; j < C; ++j) {
-            softmax_row[j] = std::expf(row[j] - m);
+            softmax_row[j] = expf(row[j] - m);
             sum_exp += softmax_row[j];
         }
         
@@ -96,7 +96,7 @@ std::shared_ptr<Tensor> cross_entropy_loss(std::shared_ptr<Tensor> logits,
         // Compute loss: -log(p[correct_class])
         size_t y = labels[n];
         if (y >= C) throw std::runtime_error("cross_entropy: label out of range");
-        loss_val += -std::logf(softmax_row[y]);
+        loss_val += -logf(softmax_row[y]);
     }
     out->data[0] = loss_val / static_cast<float>(N);
 
