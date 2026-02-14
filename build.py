@@ -90,18 +90,22 @@ def main():
     
     if pybind11_dir:
         cmake_args.append(f"-DCMAKE_PREFIX_PATH={pybind11_dir}")
+    else:
+        print("Warning: proceeding without explicit pybind11 path")
     
     # Platform-specific configuration
     if platform.system() == "Windows":
         cmake_args.extend(["-DCMAKE_BUILD_TYPE=Release"])
     
+    print(f"CMake command: {' '.join(cmake_args)}")
+    
     # Configure
     print("Configuring with CMake...")
     try:
         subprocess.run(cmake_args, check=True)
-    except subprocess.CalledProcessError:
-        print("\nError: CMake configuration failed.")
-        print("Make sure OpenCV and pybind11 are installed.")
+    except subprocess.CalledProcessError as e:
+        print(f"\nError: CMake configuration failed with exit code {e.returncode}")
+        print("Make sure pybind11 is installed: pip install pybind11")
         sys.exit(1)
     
     # Build
@@ -121,7 +125,7 @@ def main():
     
     print()
     print("=" * 50)
-    print("✓ Build complete!")
+    print("Build complete!")
     print(f"Extension: python/mydl/mydl_cpp.*")
     print("=" * 50)
 
