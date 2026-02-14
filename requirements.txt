@@ -1,0 +1,5 @@
+# Build-time: CMake uses pybind11 from the active Python env to build mydl_cpp.
+# No runtime Python deps; train/eval use only stdlib + the built extension.
+pybind11>=2.11.0,<3
+opencv-python>=4.5.0
+matplotlib>=3.3.0

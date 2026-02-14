@@ -1,0 +1,61 @@
+# Build artifacts
+build/
+*.so
+*.dylib
+*.pyd
+*.dll
+*.o
+*.obj
+*.a
+*.lib
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Training outputs (optional - keep these if you want to share results)
+plots/*/
+weights/*.bin
+
+# Keep directory structure
+!plots/.gitkeep
+!weights/.gitkeep
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Logs
+*.log
+docker_build_*.log
+
+# Backup files
+*.bak
+*.bak2
+*.bak3
+
+# Assignment data (don't push datasets)
+Assignment 1 Datasets/
+data_1_split/
+data_2_split/
+*.zip
