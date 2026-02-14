@@ -10,32 +10,44 @@ import platform
 from pathlib import Path
 
 
-def activate_venv():
-    """Activate virtual environment and return pybind11 path."""
+def get_pybind11_path():
+    """Get pybind11 cmake directory from venv or system Python."""
     venv_dir = Path(".venv")
     
-    if not venv_dir.exists():
-        print("Warning: .venv not found. Run scripts/setup_venv.sh first.")
-        return None
+    # Try venv first
+    if venv_dir.exists():
+        if platform.system() == "Windows":
+            python_exe = venv_dir / "Scripts" / "python.exe"
+        else:
+            python_exe = venv_dir / "bin" / "python3"
+        
+        try:
+            result = subprocess.run(
+                [str(python_exe), "-c", "import pybind11; print(pybind11.get_cmake_dir())"],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            pybind11_dir = result.stdout.strip()
+            print(f"Found pybind11 in venv at: {pybind11_dir}")
+            return pybind11_dir
+        except Exception as e:
+            print(f"Warning: Could not find pybind11 in venv: {e}")
     
-    # Get pybind11 cmake directory
-    if platform.system() == "Windows":
-        python_exe = venv_dir / "Scripts" / "python.exe"
-    else:
-        python_exe = venv_dir / "bin" / "python3"
-    
+    # Try system Python (for CI environments)
     try:
         result = subprocess.run(
-            [str(python_exe), "-c", "import pybind11; print(pybind11.get_cmake_dir())"],
+            [sys.executable, "-c", "import pybind11; print(pybind11.get_cmake_dir())"],
             capture_output=True,
             text=True,
             check=True
         )
         pybind11_dir = result.stdout.strip()
-        print(f"Found pybind11 at: {pybind11_dir}")
+        print(f"Found pybind11 in system Python at: {pybind11_dir}")
         return pybind11_dir
     except Exception as e:
-        print(f"Warning: Could not find pybind11: {e}")
+        print(f"Warning: Could not find pybind11 in system Python: {e}")
+        print("Make sure pybind11 is installed: pip install pybind11")
         return None
 
 
@@ -61,7 +73,7 @@ def main():
     os.chdir(script_dir)
     
     # Get pybind11 path
-    pybind11_dir = activate_venv()
+    pybind11_dir = get_pybind11_path()
     
     # Clean previous build
     build_dir = Path("build")
