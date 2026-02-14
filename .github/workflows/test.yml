@@ -47,6 +47,12 @@ jobs:
     - name: Build C++ extension
       run: python build.py
     
+    - name: Check built extension
+      run: |
+        echo "Checking for built extension..."
+        ls -la python/mydl/
+        find . -name "mydl_cpp*" -type f
+    
     - name: Test import
       run: python -c "import sys; sys.path.insert(0, 'python'); from mydl import SimpleCNN, Tensor; print('Import successful on ${{ matrix.os }} with Python ${{ matrix.python-version }}')"
     
