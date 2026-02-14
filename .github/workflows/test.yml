@@ -50,8 +50,7 @@ jobs:
     - name: Check built extension
       run: |
         echo "Checking for built extension..."
-        ls -la python/mydl/
-        find . -name "mydl_cpp*" -type f
+        python -c "import os; import glob; print('Files in python/mydl/:'); [print(f'  {f}') for f in os.listdir('python/mydl/') if os.path.isfile(os.path.join('python/mydl/', f))]; print('\nAll mydl_cpp files:'); [print(f'  {f}') for f in glob.glob('**/mydl_cpp*', recursive=True)]"
     
     - name: Test import
       run: python -c "import sys; sys.path.insert(0, 'python'); from mydl import SimpleCNN, Tensor; print('Import successful on ${{ matrix.os }} with Python ${{ matrix.python-version }}')"
