@@ -44,7 +44,18 @@ target_include_directories(mydl_cpp PRIVATE
 
 # pybind11_add_module creates a module that Python can import
 # Output directly to python/mydl/ directory
+# On Windows, also prevent the Release/Debug subdirectory
 set_target_properties(mydl_cpp PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/mydl
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/mydl
   OUTPUT_NAME mydl_cpp
 )
+
+# For multi-config generators (MSVC), set output directory for all configs
+foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
+  string(TOUPPER ${CONFIG} CONFIG_UPPER)
+  set_target_properties(mydl_cpp PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY_${CONFIG_UPPER} ${CMAKE_CURRENT_SOURCE_DIR}/python/mydl
+    RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER} ${CMAKE_CURRENT_SOURCE_DIR}/python/mydl
+  )
+endforeach()
