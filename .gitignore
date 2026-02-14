@@ -53,9 +53,3 @@ docker_build_*.log
 *.bak
 *.bak2
 *.bak3
-
-# Assignment data (don't push datasets)
-Assignment 1 Datasets/
-data_1_split/
-data_2_split/
-*.zip
