@@ -42,11 +42,9 @@ target_include_directories(mydl_cpp PRIVATE
 # Note: No OpenCV linking needed!
 # Images are loaded in Python using opencv-python (pip package)
 
-# Install to python/mydl so that Python can import mydl
-# pybind11 automatically sets the correct extension suffix
+# pybind11_add_module creates a module that Python can import
+# Output directly to python/mydl/ directory
 set_target_properties(mydl_cpp PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/mydl
+  OUTPUT_NAME mydl_cpp
 )
-
-# pybind11_add_module already sets PREFIX to "" and correct SUFFIX
-# No need to manually override these properties
