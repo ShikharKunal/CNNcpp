@@ -48,11 +48,12 @@ jobs:
       run: python build.py
     
     - name: Test import
-      run: python -c "from python.mydl import SimpleCNN, Tensor; print('✓ Import successful on ${{ matrix.os }} with Python ${{ matrix.python-version }}')"
+      run: python -c "from python.mydl import SimpleCNN, Tensor; print('Import successful on ${{ matrix.os }} with Python ${{ matrix.python-version }}')"
     
     - name: Test basic functionality
-      run: python -c "from python.mydl import SimpleCNN; model = SimpleCNN(10); print('✓ Model creation successful'); print(f'Parameters: {model.count_parameters()}')"
+      run: |
+        python -c "from python.mydl import SimpleCNN; model = SimpleCNN(10); print('Model creation successful'); print('Parameters:', model.count_parameters())"
     
     - name: Show build info
       run: |
-        python -c "import platform; print(f'Platform: {platform.system()} {platform.release()}'); print(f'Python: {platform.python_version()}')"
+        python -c "import platform; print('Platform:', platform.system(), platform.release()); print('Python:', platform.python_version())"
