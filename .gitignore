@@ -53,3 +53,8 @@ docker_build_*.log
 *.bak
 *.bak2
 *.bak3
+
+# Large dataset files (added to fix push issue)
+Assignment 1 Datasets/*.zip
+*.bin
+!weights/.gitkeep
