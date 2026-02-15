@@ -42,8 +42,17 @@ def main():
     plots_dir = script_dir / "plots" / timestamp
     plots_dir.mkdir(parents=True, exist_ok=True)
     
-    # Create weights directory
-    weights_path = script_dir / args.weights
+    # Load dataset path to get dataset name
+    dataset_path = Path(args.dataset).resolve()
+    if not dataset_path.exists():
+        print(f"Error: Dataset path does not exist: {dataset_path}")
+        sys.exit(1)
+    
+    # Create weights path using timestamp ID
+    if args.weights == "weights/model.bin":  # If using default
+        weights_path = script_dir / "weights" / f"{timestamp}.bin"
+    else:  # If user specified custom path, use it as-is
+        weights_path = script_dir / args.weights
     weights_path.parent.mkdir(parents=True, exist_ok=True)
     
     print("=" * 50)
@@ -53,17 +62,13 @@ def main():
     print(f"Epochs:     {args.epochs}")
     print(f"Batch Size: {args.batch_size}")
     print(f"Learn Rate: {args.lr}")
-    print(f"Weights:    {args.weights}")
+    print(f"Weights:    {weights_path}")
     print(f"Plots:      {plots_dir}")
     print("=" * 50)
     print()
     
     # Load dataset
     print("Loading dataset...", flush=True)
-    dataset_path = Path(args.dataset).resolve()
-    if not dataset_path.exists():
-        print(f"Error: Dataset path does not exist: {dataset_path}")
-        sys.exit(1)
     
     result = load_dataset_from_directory(str(dataset_path))
     images = result.images
@@ -161,6 +166,7 @@ def main():
     print(f"Weights saved to {weights_path}", flush=True)
     
     # Save metrics
+    plots_dir.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
     metrics_path = plots_dir / "metrics.json"
     with open(metrics_path, 'w') as f:
         json.dump(metrics, f, indent=2)

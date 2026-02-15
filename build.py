@@ -96,6 +96,13 @@ def main():
     # Platform-specific configuration
     if platform.system() == "Windows":
         cmake_args.extend(["-DCMAKE_BUILD_TYPE=Release"])
+    elif platform.system() == "Darwin":
+        # Force native macOS architecture to avoid loading x86_64 extension in arm64 Python (or vice-versa).
+        mac_arch = platform.machine().lower()
+        if mac_arch in ("arm64", "aarch64"):
+            cmake_args.append("-DCMAKE_OSX_ARCHITECTURES=arm64")
+        elif mac_arch in ("x86_64", "amd64"):
+            cmake_args.append("-DCMAKE_OSX_ARCHITECTURES=x86_64")
     
     print(f"CMake command: {' '.join(cmake_args)}")
     
