@@ -58,3 +58,15 @@ docker_build_*.log
 Assignment 1 Datasets/*.zip
 *.bin
 !weights/.gitkeep
+
+# Dataset directories
+data_*/
+data/
+dataset/
+datasets/
+Assignment*/
+*.zip
+*.tar.gz
+*.tar
+*.rar
+*.7z

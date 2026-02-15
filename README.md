@@ -10,7 +10,7 @@ A minimal CNN framework built from scratch in C++ with Python bindings.
 |----------|-------------|
 | **Linux** | Python 3.8+, CMake 3.14+, g++, pip |
 | **macOS** | Python 3.8+, CMake 3.14+, Xcode Command Line Tools |
-| **Windows** | Python 3.8+, CMake 3.14+, Visual Studio Build Tools |
+| **Windows** | Python 3.8+, CMake 3.14+, MinGW-w64 GCC |
 
 ---
 
@@ -33,26 +33,71 @@ sudo apt install python3 python3-dev python3-pip cmake g++
 brew install python cmake
 ```
 
-**Windows (Option 1 - Visual Studio Build Tools):**
-1. Install [Python 3.8+](https://www.python.org/downloads/) (check "Add to PATH")
-2. Install [CMake](https://cmake.org/download/) (check "Add to PATH")
-3. Install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/) with "Desktop development with C++"
+**Windows (MinGW):**
 
-**Windows (Option 2 - MinGW):**
-1. Install [Python 3.8+](https://www.python.org/downloads/) (check "Add to PATH")
-2. Install [CMake](https://cmake.org/download/) (check "Add to PATH")
-3. Install [MinGW-w64](https://www.mingw-w64.org/downloads/) or via [MSYS2](https://www.msys2.org/):
-   ```bash
-   # Using MSYS2 (recommended)
-   # Download and install MSYS2 from https://www.msys2.org/
-   # Then in MSYS2 terminal:
-   pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake
-   ```
-4. Add MinGW to PATH: `C:\msys64\mingw64\bin` (or your MinGW installation path)
-5. Set CMake to use MinGW:
-   ```cmd
-   set CMAKE_GENERATOR=MinGW Makefiles
-   ```
+**Step 1: Install Python**
+1. Download [Python 3.8+](https://www.python.org/downloads/)
+2. Run installer and **check "Add Python to PATH"**
+3. Verify: Open Command Prompt and run `python --version`
+
+**Step 2: Install CMake**
+
+Choose one option:
+
+- **Option A: CMake Installer (Recommended)**
+  1. Download from https://cmake.org/download/
+  2. Get "Windows x64 Installer" (e.g., `cmake-3.28.1-windows-x86_64.msi`)
+  3. Run installer
+  4. **Important:** Check "Add CMake to system PATH for all users"
+  5. Complete installation
+  6. Verify: Open **new** Command Prompt and run `cmake --version`
+
+- **Option B: Portable CMake**
+  1. Download "Windows x64 ZIP" from https://cmake.org/download/
+  2. Extract to `C:\cmake`
+  3. Add to PATH manually:
+     - Press `Win + R`, type `sysdm.cpl`, press Enter
+     - Advanced → Environment Variables
+     - Edit PATH → Add `C:\cmake\bin`
+  4. Verify: Open **new** Command Prompt and run `cmake --version`
+
+**Step 3: Install MinGW-w64**
+
+Choose one option:
+
+- **Option A: Via MSYS2 (Recommended)**
+  1. Download and install [MSYS2](https://www.msys2.org/)
+  2. Open MSYS2 terminal and run:
+     ```bash
+     pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake
+     ```
+  3. Add to PATH: `C:\msys64\mingw64\bin`
+     - Press `Win + R`, type `sysdm.cpl`, press Enter
+     - Advanced → Environment Variables
+     - Edit PATH → Add `C:\msys64\mingw64\bin`
+  4. Verify: Open **new** Command Prompt and run `gcc --version`
+
+- **Option B: Standalone MinGW-w64**
+  1. Download from https://www.mingw-w64.org/downloads/
+  2. Follow installation instructions
+  3. Add MinGW bin directory to PATH
+
+**Step 4: Configure CMake for MinGW**
+
+Set CMake to use MinGW compiler:
+
+```cmd
+# Temporary (current session only)
+set CMAKE_GENERATOR=MinGW Makefiles
+
+# Permanent (recommended)
+# Add as system environment variable:
+# Variable name: CMAKE_GENERATOR
+# Variable value: MinGW Makefiles
+```
+
+> **Note:** For detailed MinGW setup instructions, see [MINGW_QUICKSTART.md](MINGW_QUICKSTART.md)
+
 
 ### 2. Create Virtual Environment (Recommended)
 
@@ -92,7 +137,8 @@ python -m pip install -r requirements.txt
 # Linux/macOS
 python3 build.py
 
-# Windows
+# Windows (set generator first if not set permanently)
+set CMAKE_GENERATOR=MinGW Makefiles
 python build.py
 ```
 
