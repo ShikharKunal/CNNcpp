@@ -10,7 +10,9 @@
 
 namespace mydl {
 
-// Simple CNN: Conv2D -> ReLU -> MaxPool -> Flatten -> Linear
+// Simple CNN:
+// Conv2D -> ReLU -> Conv2D -> ReLU -> MaxPool -> Conv2D -> ReLU -> MaxPool
+// -> Flatten -> Linear -> ReLU -> Linear
 // Input: (N, 3, 32, 32). Output: (N, num_classes).
 class SimpleCNN {
 public:
@@ -27,8 +29,15 @@ private:
     size_t num_classes_;
     std::shared_ptr<Conv2DLayer> conv_;
     std::shared_ptr<ReLULayer> relu_;
+    std::shared_ptr<Conv2DLayer> conv2_;
+    std::shared_ptr<ReLULayer> relu2_;
     std::shared_ptr<MaxPool2DLayer> pool_;
-    std::shared_ptr<LinearLayer> linear_;
+    std::shared_ptr<Conv2DLayer> conv3_;
+    std::shared_ptr<ReLULayer> relu3_;
+    std::shared_ptr<MaxPool2DLayer> pool2_;
+    std::shared_ptr<LinearLayer> linear1_;
+    std::shared_ptr<ReLULayer> relu_fc_;
+    std::shared_ptr<LinearLayer> linear2_;
     size_t flat_size_;  // after conv+relu+pool: C * H' * W'
 };
 
