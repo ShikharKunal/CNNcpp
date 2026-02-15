@@ -1,37 +1,81 @@
-# mydl – Custom Deep Learning Framework
+# CNN Deep Learning Framework - Setup Guide
 
-A minimal deep learning framework built from scratch in C++ with Python bindings for **GNR638: Machine Learning for Remote Sensing – II**.
-
-**Key Features:**
-- Custom CNN implementation with Conv2D, ReLU, MaxPool2D, and Linear layers
-- Automatic differentiation with dynamic computation graphs
-- Cross-platform: Works on Linux, macOS, and Windows
-- No external ML libraries (PyTorch, TensorFlow, NumPy, Eigen)
-- Optimized for speed: ~50s/epoch training time
+A minimal CNN framework built from scratch in C++ with Python bindings.
 
 ---
 
-## Quick Start (All Platforms)
-
-### Prerequisites
-
-Install these before getting started:
+## Prerequisites
 
 | Platform | Requirements |
 |----------|-------------|
-| **Linux** | Python 3.8+, CMake 3.14+, g++ |
-| **macOS** | Python 3.8+, CMake 3.14+ (via Homebrew) |
+| **Linux** | Python 3.8+, CMake 3.14+, g++, pip |
+| **macOS** | Python 3.8+, CMake 3.14+, Xcode Command Line Tools |
 | **Windows** | Python 3.8+, CMake 3.14+, Visual Studio Build Tools |
 
-### Installation
+---
 
-**1. Clone the repository**
+## Setup
+
+### 1. Install Dependencies
+
+**Linux (Ubuntu/Debian):**
 ```bash
-git clone https://github.com/ShikharKunal/CNNcpp.git
-cd CNNcpp
+sudo apt update
+sudo apt install python3 python3-dev python3-pip cmake g++
 ```
 
-**2. Install Python dependencies**
+**macOS:**
+```bash
+# Install Homebrew if needed
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install dependencies
+brew install python cmake
+```
+
+**Windows (Option 1 - Visual Studio Build Tools):**
+1. Install [Python 3.8+](https://www.python.org/downloads/) (check "Add to PATH")
+2. Install [CMake](https://cmake.org/download/) (check "Add to PATH")
+3. Install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/) with "Desktop development with C++"
+
+**Windows (Option 2 - MinGW):**
+1. Install [Python 3.8+](https://www.python.org/downloads/) (check "Add to PATH")
+2. Install [CMake](https://cmake.org/download/) (check "Add to PATH")
+3. Install [MinGW-w64](https://www.mingw-w64.org/downloads/) or via [MSYS2](https://www.msys2.org/):
+   ```bash
+   # Using MSYS2 (recommended)
+   # Download and install MSYS2 from https://www.msys2.org/
+   # Then in MSYS2 terminal:
+   pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake
+   ```
+4. Add MinGW to PATH: `C:\msys64\mingw64\bin` (or your MinGW installation path)
+5. Set CMake to use MinGW:
+   ```cmd
+   set CMAKE_GENERATOR=MinGW Makefiles
+   ```
+
+### 2. Create Virtual Environment (Recommended)
+
+Using a virtual environment keeps dependencies isolated and avoids conflicts:
+
+```bash
+# Linux/macOS
+python3 -m venv venv
+source venv/bin/activate
+
+# Windows (cmd)
+python -m venv venv
+venv\Scripts\activate
+
+# Windows (PowerShell)
+python -m venv venv
+venv\Scripts\Activate.ps1
+```
+
+You should see `(venv)` in your terminal prompt when activated.
+
+### 3. Install Python Packages
+
 ```bash
 # Linux/macOS
 python3 -m pip install -r requirements.txt
@@ -40,24 +84,9 @@ python3 -m pip install -r requirements.txt
 python -m pip install -r requirements.txt
 ```
 
-**3. Build the C++ extension**
-```bash
-# Linux/macOS
-python3 build.py
+**Required packages:** `pybind11`, `opencv-python`, `matplotlib`
 
-# Windows
-python build.py
-```
-
-That's it! The framework is ready to use.
-
----
-
-## Usage
-
-### 1. Build Command
-
-Compiles the C++ backend. Run this once initially, or after modifying C++ code.
+### 4. Build the Framework
 
 ```bash
 # Linux/macOS
@@ -67,115 +96,147 @@ python3 build.py
 python build.py
 ```
 
-**Output:** Creates `python/mydl/mydl_cpp.*` extension module
+This compiles the C++ backend and creates the Python extension module.
 
 ---
 
-### 2. Train Command
+## Dataset Preparation
 
-Train a CNN model on your dataset.
+### Dataset Format
 
-#### Linux/macOS
-```bash
-python3 train_model.py --dataset path/to/train_data --epochs 10 --lr 0.01
+Organize your dataset with one folder per class:
+
+```
+dataset/
+├── class_0/
+│   ├── img1.png
+│   └── img2.png
+├── class_1/
+│   └── ...
+└── class_n/
+    └── ...
 ```
 
-#### Windows (cmd)
-```cmd
-python train_model.py --dataset path\to\train_data --epochs 10 --lr 0.01
-```
+- Supported formats: PNG, JPEG, JPG
+- Images are automatically resized to 32×32
 
-#### Windows (PowerShell)
-```powershell
-python train_model.py --dataset path\to\train_data --epochs 10 --lr 0.01
-```
-
-#### Available Options
-
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--dataset` | *required* | Path to training dataset directory |
-| `--epochs` | 10 | Number of training epochs |
-| `--batch-size` | 32 | Batch size for training |
-| `--lr` | 0.01 | Learning rate |
-| `--weights` | weights/model.bin | Path to save trained weights |
-
-#### Example with All Options
+### Split Dataset (Train/Test)
 
 ```bash
 # Linux/macOS
-python3 train_model.py \
-  --dataset data_1_split/train \
-  --epochs 20 \
-  --batch-size 64 \
-  --lr 0.005 \
-  --weights weights/my_model.bin
+python3 split_dataset.py --input <dataset_path> --output <output_dir> --split 0.8 --seed 42
 
 # Windows
-python train_model.py --dataset data_1_split\train --epochs 20 --batch-size 64 --lr 0.005 --weights weights\my_model.bin
+python split_dataset.py --input <dataset_path> --output <output_dir> --split 0.8 --seed 42
 ```
 
-#### Training Outputs
+**Arguments:**
+- `--input`: Path to original dataset
+- `--output`: Output directory (creates `train/` and `test/` subdirectories)
+- `--split`: Train ratio (default: 0.8 = 80% train, 20% test)
+- `--seed`: Random seed for reproducibility (default: 42)
 
-After training completes, you'll find:
+**Example:**
+```bash
+python3 split_dataset.py --input "Assignment 1 Datasets/data_1" --output data_1_split --split 0.8 --seed 42
+```
 
-1. **Trained model weights:** `weights/model.bin` (or your specified path)
+**Output:**
+```
+data_1_split/
+├── train/
+│   ├── class_0/
+│   ├── class_1/
+│   └── ...
+└── test/
+    ├── class_0/
+    ├── class_1/
+    └── ...
+```
+
+---
+
+## Training
+
+### Basic Usage
+
+```bash
+# Linux/macOS
+python3 train_model.py --config config/data_1.json --dataset data_1_split/train
+
+# Windows
+python train_model.py --config config/data_1.json --dataset data_1_split\train
+```
+
+### Configuration Files
+
+Training uses JSON config files in the `config/` directory:
+
+**`config/data_1.json`** - For data_1 dataset (20 epochs):
+```json
+{
+  "epochs": 20,
+  "batch_size": 32,
+  "learning_rate": 0.01,
+  "weights_dir": "weights",
+  "plots_dir": "plots",
+  "save_metrics": true,
+  "generate_plots": true,
+  "print_batch_interval": 200
+}
+```
+
+**`config/data_2.json`** - For data_2 dataset (30 epochs):
+```json
+{
+  "epochs": 30,
+  "batch_size": 32,
+  "learning_rate": 0.01,
+  ...
+}
+```
+
+### Training Parameters Used
+
+| Parameter | data_1 | data_2 |
+|-----------|--------|--------|
+| Epochs | 20 | 30 |
+| Batch Size | 32 | 32 |
+| Learning Rate | 0.01 | 0.01 |
+| Optimizer | SGD | SGD |
+
+### Training Outputs
+
+After training, you'll find:
+
+1. **Model weights:** `weights/<timestamp>.bin`
 2. **Metrics and plots:** `plots/<timestamp>/`
-   - `metrics.json` - Training history (loss, accuracy, time per epoch)
-   - `loss_curve.png` - Training loss over epochs
-   - `accuracy_curve.png` - Training accuracy over epochs
-   - `time_per_epoch.png` - Time taken per epoch
-   - `combined_metrics.png` - All metrics in one figure
+   - `metrics.json` - Training history
+   - `loss_curve.png` - Loss over epochs
+   - `accuracy_curve.png` - Accuracy over epochs
+   - `time_per_epoch.png` - Time per epoch
+   - `training_curves.png` - Combined metrics
 
 ---
 
-### 3. Test/Evaluate Command
+## Testing/Evaluation
 
-Evaluate a trained model on test data.
-
-#### Linux/macOS
 ```bash
-python3 test_model.py --dataset path/to/test_data --weights weights/model.bin
+# Linux/macOS
+python3 test_model.py --dataset data_1_split/test --weights weights/<timestamp>.bin
+
+# Windows
+python test_model.py --dataset data_1_split\test --weights weights\<timestamp>.bin
 ```
 
-#### Windows (cmd)
-```cmd
-python test_model.py --dataset path\to\test_data --weights weights\model.bin
-```
-
-#### Windows (PowerShell)
-```powershell
-python test_model.py --dataset path\to\test_data --weights weights\model.bin
-```
-
-#### Available Options
-
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--dataset` | *required* | Path to test dataset directory |
-| `--weights` | *required* | Path to trained model weights |
-
-#### Evaluation Output
-
-Prints to console:
-- Test accuracy (%)
-- Total parameters
-- MACs (Multiply-Accumulate operations)
-- FLOPs (Floating Point Operations)
-
-**Example output:**
-```
-Test Accuracy: 92.34%
-Model Parameters: 4,056
-MACs: 270,720
-FLOPs: 541,440
-```
+**Output:**
+- Test loss and accuracy
+- Model parameters count
+- MACs and FLOPs
 
 ---
 
-## Complete Example Workflow
-
-Here's a complete example from build to evaluation:
+## Complete Workflow Example
 
 ### Linux/macOS
 
@@ -183,14 +244,14 @@ Here's a complete example from build to evaluation:
 # 1. Build
 python3 build.py
 
-# 2. Split your dataset (if needed)
-python3 split_dataset.py --input data_1 --output data_1_split --split 0.8
+# 2. Split dataset
+python3 split_dataset.py --input "Assignment 1 Datasets/data_1" --output data_1_split --split 0.8 --seed 42
 
-# 3. Train on training set
-python3 train_model.py --dataset data_1_split/train --epochs 10 --lr 0.01
+# 3. Train
+python3 train_model.py --config config/data_1.json --dataset data_1_split/train
 
-# 4. Evaluate on test set
-python3 test_model.py --dataset data_1_split/test --weights weights/model.bin
+# 4. Test
+python3 test_model.py --dataset data_1_split/test --weights weights/20260215_214008.bin
 ```
 
 ### Windows
@@ -199,190 +260,76 @@ python3 test_model.py --dataset data_1_split/test --weights weights/model.bin
 REM 1. Build
 python build.py
 
-REM 2. Split your dataset (if needed)
-python split_dataset.py --input data_1 --output data_1_split --split 0.8
+REM 2. Split dataset
+python split_dataset.py --input "Assignment 1 Datasets\data_1" --output data_1_split --split 0.8 --seed 42
 
-REM 3. Train on training set
-python train_model.py --dataset data_1_split\train --epochs 10 --lr 0.01
+REM 3. Train
+python train_model.py --config config\data_1.json --dataset data_1_split\train
 
-REM 4. Evaluate on test set
-python test_model.py --dataset data_1_split\test --weights weights\model.bin
+REM 4. Test
+python test_model.py --dataset data_1_split\test --weights weights\20260215_214008.bin
 ```
 
 ---
 
-## Dataset Format
+## Platform-Specific Notes
 
-Your dataset should be organized in the following structure:
+### Path Separators
+- **Linux/macOS:** Use `/` (forward slash)
+- **Windows:** Use `\` (backslash) or `/` (both work)
 
-```
-dataset/
-├── class_1/
-│   ├── image1.png
-│   ├── image2.png
-│   └── ...
-├── class_2/
-│   ├── image1.png
-│   └── ...
-└── class_n/
-    └── ...
-```
+### Python Command
+- **Linux/macOS:** `python3`
+- **Windows:** `python`
 
-- Each subdirectory represents a class
-- Images can be any size (automatically resized to 32×32)
-- Supported formats: PNG, JPEG, JPG
-
----
-
-## Platform-Specific Setup Details
-
-### Linux (Ubuntu/Debian)
-
+### Rebuilding
+If you modify C++ code, rebuild:
 ```bash
-# Install system dependencies
-sudo apt update
-sudo apt install python3 python3-dev python3-pip cmake g++
+# Clean build (if needed)
+rm -rf build python/mydl/mydl_cpp.*  # Linux/macOS
+rmdir /s build & del python\mydl\mydl_cpp.*  # Windows
 
-# Install Python packages
-python3 -m pip install -r requirements.txt
-
-# Build
-python3 build.py
+# Rebuild
+python3 build.py  # Linux/macOS
+python build.py   # Windows
 ```
-
-### Linux (Fedora/RHEL)
-
-```bash
-# Install system dependencies
-sudo dnf install python3 python3-devel cmake gcc-c++
-
-# Install Python packages
-python3 -m pip install -r requirements.txt
-
-# Build
-python3 build.py
-```
-
-### macOS
-
-```bash
-# Install Homebrew (if not already installed)
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# Install dependencies
-brew install python cmake
-
-# Install Python packages
-python3 -m pip install -r requirements.txt
-
-# Build
-python3 build.py
-```
-
-### Windows
-
-1. **Install Python 3.8+** from [python.org](https://www.python.org/downloads/)
-   - Check "Add Python to PATH" during installation
-
-2. **Install CMake** from [cmake.org](https://cmake.org/download/)
-   - Check "Add CMake to system PATH" during installation
-
-3. **Install Visual Studio Build Tools**
-   - Download from [visualstudio.microsoft.com](https://visualstudio.microsoft.com/downloads/)
-   - Select "Desktop development with C++" workload
-
-4. **Install Python packages:**
-   ```cmd
-   python -m pip install -r requirements.txt
-   ```
-
-5. **Build:**
-   ```cmd
-   python build.py
-   ```
-
----
-
-## Model Architecture
-
-The framework implements a SimpleCNN with the following architecture:
-
-```
-Input (3×32×32)
-    ↓
-Conv2D (3→8 channels, 3×3 kernel, stride=2)
-    ↓
-ReLU
-    ↓
-MaxPool2D (2×2, stride=2)
-    ↓
-Flatten
-    ↓
-Linear (128 → num_classes)
-```
-
-**Performance Characteristics:**
-- **10 classes:** ~4,000 parameters, ~270K MACs, ~540K FLOPs
-- **100 classes:** ~39,000 parameters, ~2.7M MACs, ~5.4M FLOPs
-- **Training speed:** ~50 seconds/epoch (on typical hardware)
-- **Memory efficient:** Batch tensor reuse, cache-optimized convolution
-
----
-
-## Performance Optimization
-
-The framework includes several optimizations:
-
-1. **Float32 precision** (instead of double)
-2. **Compiler optimizations** (-O3 -ffast-math)
-3. **Cache-optimized convolution** loops
-4. **Batch tensor reuse** in data loading
-5. **Bit operations** for stride=2 calculations
-6. **Memory-efficient gradient zeroing** (memset)
-
-**Result:** 6x speedup from initial implementation (~300s → ~50s per epoch)
-
----
-
-## Continuous Integration
-
-The project uses GitHub Actions for automated testing across:
-- **Operating Systems:** Ubuntu, macOS, Windows
-- **Python Versions:** 3.8, 3.10, 3.12
-
-[![Build Status](https://github.com/ShikharKunal/CNNcpp/actions/workflows/test.yml/badge.svg)](https://github.com/ShikharKunal/CNNcpp/actions)
 
 ---
 
 ## Troubleshooting
 
-### Build fails with "pybind11 not found"
+**Build fails:**
 ```bash
-# Make sure pybind11 is installed
+# Ensure pybind11 is installed
 python3 -m pip install pybind11
 ```
 
-### Import error: "cannot import name 'mydl_cpp'"
+**Import error:**
 ```bash
-# Rebuild the extension
+# Rebuild
 python3 build.py
 ```
 
-### Windows: "cmake is not recognized"
-- Make sure CMake is installed and added to PATH
-- Restart your terminal after installation
+**Windows: "cmake not recognized":**
+- Restart terminal after installing CMake
+- Verify CMake is in PATH
 
-### macOS: Architecture mismatch error
+**Slow training:**
+- 50-75s/epoch is normal
+- First epoch may be slower (data loading)
+
+---
+
+## Random Seed
+
+The dataset splitting uses `--seed 42` by default for reproducibility. This ensures:
+- Same train/test split across runs
+- Consistent results for validation
+
+To use a different seed:
 ```bash
-# Clean rebuild
-rm -rf build python/mydl/mydl_cpp*
-python3 build.py
+python3 split_dataset.py --input data --output data_split --seed 123
 ```
-
-### Training appears slow
-- Training ~50-60s/epoch is normal
-- First epoch may be slower due to data loading
-- Check that compiler optimizations are enabled (they are by default)
 
 ---
 
@@ -390,52 +337,14 @@ python3 build.py
 
 ```
 mydl/
-├── cpp/                      # C++ backend
-│   ├── tensor.cpp           # Tensor class with autograd
-│   ├── ops.cpp              # Operations (add, mul, matmul, etc.)
-│   ├── layers.cpp           # CNN layers
-│   ├── loss.cpp             # Loss functions
-│   ├── optimizer.cpp        # SGD optimizer
-│   ├── dataloader.cpp       # Dataset loading
-│   ├── metrics.cpp          # Accuracy/loss metrics
-│   ├── model.cpp            # SimpleCNN model
-│   └── bindings.cpp         # Python bindings
-├── python/                   # Python frontend
-│   └── mydl/                # Main package
-│       ├── __init__.py      # Package initialization
-│       └── dataset_loader.py # Python-based image loading
-├── build.py                 # Build script (all platforms)
-├── train_model.py           # Training script
-├── test_model.py            # Evaluation script
-├── split_dataset.py         # Dataset splitting utility
-├── CMakeLists.txt           # CMake configuration
-├── requirements.txt         # Python dependencies
-└── README.md                # This file
+├── cpp/                    # C++ backend
+├── python/mydl/            # Python package
+├── config/                 # Training configs
+│   ├── data_1.json        # 20 epochs
+│   └── data_2.json        # 30 epochs
+├── build.py               # Build script
+├── train_model.py         # Training script
+├── test_model.py          # Evaluation script
+├── split_dataset.py       # Dataset splitter
+└── requirements.txt       # Python dependencies
 ```
-
----
-
-## Dependencies
-
-**Python packages (installed via pip):**
-- `pybind11>=2.11.0` - Python-C++ bindings
-- `opencv-python>=4.5.0` - Image loading and preprocessing
-- `matplotlib>=3.3.0` - Plotting training metrics
-
-**C++ dependencies (header-only, no installation needed):**
-- C++17 standard library
-- CMake build system
-
----
-
-## License
-
-This project was created for academic purposes as part of GNR638 coursework at IIT Bombay.
-
----
-
-## Acknowledgments
-
-- Course: GNR638 – Machine Learning for Remote Sensing – II
-- Institution: IIT Bombay
-- Semester: Spring 2025-26

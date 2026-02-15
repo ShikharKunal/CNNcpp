@@ -39,9 +39,6 @@ target_include_directories(mydl_cpp PRIVATE
 )
 
 
-# Note: No OpenCV linking needed!
-# Images are loaded in Python using opencv-python (pip package)
-
 # pybind11_add_module creates a module that Python can import
 # Output directly to python/mydl/ directory
 # On Windows, also prevent the Release/Debug subdirectory
