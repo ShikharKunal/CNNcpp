@@ -1,0 +1,10 @@
+{
+    "epochs": 20,
+    "batch_size": 32,
+    "learning_rate": 0.01,
+    "weights_dir": "weights",
+    "plots_dir": "plots",
+    "save_metrics": true,
+    "generate_plots": true,
+    "print_batch_interval": 200
+}
